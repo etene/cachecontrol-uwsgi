@@ -16,7 +16,7 @@ class UWSGICache(BaseCache):
     def get(self, key):
         return uwsgi.cache_get(key, self.name)
 
-    def set(self, key, value, expires=None):
+    def set(self, key, value, expires=None):  # noqa: A003
         if expires:
             expires = int((expires - datetime.utcnow()).total_seconds())
             assert expires, "Cache entry expires too soon"

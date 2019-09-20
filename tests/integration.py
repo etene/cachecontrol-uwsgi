@@ -1,17 +1,17 @@
-from datetime import datetime
 from distutils.spawn import find_executable
 from os import path
 from shutil import rmtree
 from subprocess import Popen
 from tempfile import mkdtemp
 from time import sleep
+from datetime import datetime
 
 import pytest
 import requests_unixsocket
 
 UWSGI = find_executable("uwsgi")
 
-assert UWSGI, "uwsgi executable not found !"
+assert UWSGI is not None, "uwsgi executable not found !"
 
 
 class UWSGIFixture:
@@ -42,8 +42,12 @@ class UWSGIFixture:
             env={"CACHE_NAME": self.cache_name}
         )
         # wait for sockets to be created by uwsgi
-        while not all(map(path.exists, self.socks.values())):
+        for _ in range(10):
+            if all(map(path.exists, self.socks.values())):
+                break
             sleep(1)
+        else:
+            raise TimeoutError("uwsgi didn't start")
         return self
 
     def sock_url(self, name):
@@ -123,7 +127,8 @@ def test_cache_expiration(uwsgi_server):
     # (one second isn't enough, it gets rounded down)
     cache_key = "/expires_after_1s"
     cache_content = b"be gone"
-    expires = int(datetime.utcnow().timestamp()) + 2
+    # expires = int(datetime.utcnow().timestamp()) + 2  # py3 only
+    expires = int(datetime.utcnow().strftime("%s")) + 2
     assert uwsgi_server.request(
         "post", cache_key,
         data=cache_content, params={"expires": expires}

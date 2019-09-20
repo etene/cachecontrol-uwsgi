@@ -1,0 +1,2 @@
+[run]
+include=cachecontrol_uwsgi/*.py
