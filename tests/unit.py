@@ -1,11 +1,14 @@
 import sys
-from datetime import datetime, timedelta
-from mock import Mock, patch
-import pytest
-from cachecontrol import CacheControl
-from requests import Session
-import responses
+
 from collections import defaultdict
+from datetime import datetime, timedelta
+
+import pytest
+import responses
+
+from cachecontrol import CacheControl
+from mock import Mock, patch
+from requests import Session
 
 TIME_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 

@@ -1,10 +1,10 @@
+from datetime import datetime
 from distutils.spawn import find_executable
 from os import path
 from shutil import rmtree
 from subprocess import Popen
 from tempfile import mkdtemp
 from time import sleep
-from datetime import datetime
 
 import pytest
 import requests_unixsocket
@@ -47,7 +47,7 @@ class UWSGIFixture:
                 break
             sleep(1)
         else:
-            raise TimeoutError("uwsgi didn't start")
+            raise RuntimeError("uwsgi didn't start")
         return self
 
     def sock_url(self, name):
