@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime, timedelta
 from mock import Mock, patch
 import pytest
 from cachecontrol import CacheControl
@@ -45,6 +46,14 @@ def test_bare(cachecontrol_uwsgi):
     # Clear
     cache.clear()
     uwsgi.cache_clear.assert_called_once_with(cache.name)
+    # Expire
+    expires = datetime.utcnow() + timedelta(seconds=10)
+    expected_expire_arg = 9  # Rounded down
+    uwsgi.cache_update.reset_mock()
+    cache.set("expiring_key", "expiring_value", expires)
+    uwsgi.cache_update.assert_called_once_with(
+        "expiring_key", "expiring_value", expected_expire_arg, cache.name
+    )
 
 
 @responses.activate
