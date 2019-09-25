@@ -1,10 +1,14 @@
 import sys
-from mock import Mock, patch
-import pytest
-from cachecontrol import CacheControl
-from requests import Session
-import responses
+
 from collections import defaultdict
+from datetime import datetime, timedelta
+
+import pytest
+import responses
+
+from cachecontrol import CacheControl
+from mock import Mock, patch
+from requests import Session
 
 TIME_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
@@ -45,6 +49,14 @@ def test_bare(cachecontrol_uwsgi):
     # Clear
     cache.clear()
     uwsgi.cache_clear.assert_called_once_with(cache.name)
+    # Expire
+    expires = datetime.utcnow() + timedelta(seconds=10)
+    expected_expire_arg = 9  # Rounded down
+    uwsgi.cache_update.reset_mock()
+    cache.set("expiring_key", "expiring_value", expires)
+    uwsgi.cache_update.assert_called_once_with(
+        "expiring_key", "expiring_value", expected_expire_arg, cache.name
+    )
 
 
 @responses.activate
