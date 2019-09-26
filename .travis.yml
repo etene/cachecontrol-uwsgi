@@ -1,13 +1,22 @@
 sudo: false
 language: python
 python:
-  - "2.7"
-  - "3.5"
-  - "3.6"
-  - "3.7"
+  - '2.7'
+  - '3.5'
+  - '3.6'
+  - '3.7'
 
 install: pip install tox-travis coveralls
 
 script: tox
 
 after_success: coveralls
+
+deploy:
+  provider: pypi
+  user: etene
+  password:
+    secure: pgL4jQqCcVCIyYgA90VUuKKdo0DuWfiQqGhYH77wUvU/G5VuyvvBCQilCjPc9PTiAC3WteV6+4DPjd05lmv65yVbExxlAO9KczTH/wZgHl8xkH/Wuis89GFRzXMH/L1yFKfdDz/iMwzmoHFNH4Cw9QBEr/a3gFPftmRmszS6AXI093cijKvP2Q7C2GQSoRbUP0PiAnk3pdUkhv4aB/C6/ekxAy2wciBopIE6aAO1ts09IFZ4SIIsBXilmxu5bJ6Og6ZnVfbE4NoZP2gVE0GPkZgasYItCX+YoEjfDu1bSCXKuYLHd7628E2qadpcV6jAJbfqcM6bWThIIPe111YM40PY0d7TbM6L4yCV552sDqcZLQQK6qo7fuMOW0u2C9kOzbUnq6F9Rgu4481ADcMuYVgHK1kFJAUiwa503TNsSEBtaF4qHrzSDbZfzCtoQLVdtZf7pIpq1fC806SgPG/rytwmQ4q8p+LpZNVoqjMaYXxQY9IQD44HX0lPYheFkGJOWoGGP6iP46WUUoFet3YPIdADsq9O7lhb8sUbwJ/xgCRv1tbc34K0YnvjWt8tO8RXHJo6ptA16RYB9xmri/RVyirJnKhktZtBIIwTa2YmdJjWC9f/hvqovKeR5MK2ZcYWlYePYrBghztxgWahpmqx4gueLGjOPIIFKIOWlZLy/QA=
+  on:
+    tags: true
+  skip_existing: true
