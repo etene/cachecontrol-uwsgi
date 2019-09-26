@@ -17,5 +17,5 @@ from cachecontrol_uwsgi import UWSGICache
 
 cached_session = CacheControl(requests.session(), cache=UWSGICache("cache_name"))
 
-response = cached_session.get("http://httbin.org/status/200")
+response = cached_session.get("http://httpbin.org/status/200")
 ```
