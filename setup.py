@@ -3,7 +3,7 @@
 import setuptools
 
 try:
-    with open("README.markdown", "r") as fh:
+    with open("README.md", "r") as fh:
         long_description = fh.read()
 except IOError:
     long_description = (
@@ -21,7 +21,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/etene/cachecontrol-uwsgi",
-    packages=setuptools.find_packages(),
+    packages=["cachecontrol_uwsgi"],
     install_requires=["cachecontrol"],
     classifiers=[
         "Programming Language :: Python :: 2.7",
