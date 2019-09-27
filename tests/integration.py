@@ -123,18 +123,18 @@ def test_delete_cache(uwsgi_server):
 
 
 def test_cache_expiration(uwsgi_server):
-    # Create an entry that expires in 2 seconds
-    # (one second isn't enough, it gets rounded down)
-    cache_key = "/expires_after_1s"
+    # Create an entry that expires in 3 seconds
+    # (one or two seconds isn't enough, it gets rounded down)
+    cache_key = "/expires_after_2s"
     cache_content = b"be gone"
-    # expires = int(datetime.utcnow().timestamp()) + 2  # py3 only
-    expires = int(datetime.utcnow().strftime("%s")) + 2
+    # expires = int(datetime.utcnow().timestamp()) + 3  # py3 only
+    expires = int(datetime.utcnow().strftime("%s")) + 3
     assert uwsgi_server.request(
         "post", cache_key,
         data=cache_content, params={"expires": expires}
     )
     uwsgi_server.assert_cache_state(items=1)
-    sleep(3)
+    sleep(4)
     # cache entry is not set anymore
     uwsgi_server.assert_cache_state(items=0)
 
