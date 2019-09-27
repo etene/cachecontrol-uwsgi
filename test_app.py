@@ -3,7 +3,7 @@ from os import getenv
 
 from flask import Flask, Response, request
 
-from cachecontrol_uwsgi import UWSGICache
+from cachecontrol_uwsgi import UWSGICache, UWSGICacheError
 
 cache = UWSGICache(getenv("CACHE_NAME"))
 
@@ -12,13 +12,34 @@ application = Flask(__name__)
 
 @application.route("/<key>", methods=["GET", "POST", "DELETE"])
 def cache_action(key):
-    if request.method == "GET":
-        return cache.get(key) or Response(status=404)
-    elif request.method == "POST":
-        expires = datetime.fromtimestamp(int(request.args.get("expires", 0)))
-        cache.set(key, request.data or "", expires)
-    elif request.method == "DELETE":
-        cache.delete(key)
+    try:
+        if request.method == "GET":
+            # GET /key -> return corresponding entry
+            value = cache.get(key)
+            if value is None:
+                return Response(status=404)
+            else:
+                return value
+        elif request.method == "POST":
+            # POST /key -> store request data
+            try:
+                expires_stamp = int(request.args["expires"])
+            except KeyError:
+                # No expires parameter passed
+                expires = None
+            except ValueError as err:
+                # Invalid parameter
+                return Response(str(err), status=400)
+            else:
+                expires = datetime.fromtimestamp(expires_stamp)
+            cache.set(key, request.data or "", expires)
+        elif request.method == "DELETE":
+            # DELETE /key -> delete corresponding entry
+            cache.delete(key)
+    except UWSGICacheError as err:
+        # Raised if trying to delete an inexistent entry,
+        # or if cache is full
+        return Response(str(err), status=400)
     return Response(status=200)
 
 

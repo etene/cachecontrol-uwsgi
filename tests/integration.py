@@ -153,3 +153,26 @@ def test_update_cache(uwsgi_server):
     resp = uwsgi_server.request("get", cache_key)
     assert resp.ok
     assert resp.content == cache_content[1]
+
+
+def test_full_cache(uwsgi_server):
+    # There are 9 possible entries in the cache,
+    # let's create 10 and expect the last one to fail
+    for i in range(10):
+        key, value = "/key%d" % i, b"value%d" % i
+        response = uwsgi_server.request("post", key, data=value)
+        if i == 9:
+            assert response.status_code == 400
+            error_message = response.content.decode()
+            assert error_message.startswith("Call to cache_update(")
+            assert error_message.endswith("failed")
+        else:
+            assert response
+
+
+def test_delete_unknown_entry(uwsgi_server):
+    response = uwsgi_server.request("delete", "/nope")
+    assert response.status_code == 400
+    error_message = response.content.decode()
+    assert error_message.startswith("Call to cache_del(")
+    assert error_message.endswith("failed")

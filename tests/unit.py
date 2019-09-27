@@ -13,7 +13,13 @@ from requests import Session
 TIME_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
-@pytest.fixture(scope="function", params=("testcache", None))
+@pytest.fixture(
+    scope="function",
+    params=(
+        {"name": "testcache", "raise_on_errors": True},
+        {"name": None, "raise_on_errors": False},
+    )
+)
 def cachecontrol_uwsgi(request):
     with patch.dict(sys.modules, {"uwsgi": Mock()}):
 
@@ -29,9 +35,10 @@ def cachecontrol_uwsgi(request):
             return fake_cache[name].get(key)
 
         mod.uwsgi.cache_update.side_effect = fake_cache_update
+        mod.uwsgi.cache_update.__name__ = "cache_update"
         mod.uwsgi.cache_get.side_effect = fake_cache_get
-
-        yield mod.UWSGICache(request.param), mod.uwsgi
+        mod.uwsgi.cache_get.__name__ = "cache_get"
+        yield mod.UWSGICache(**request.param), mod.uwsgi
 
 
 def test_bare(cachecontrol_uwsgi):
@@ -57,6 +64,20 @@ def test_bare(cachecontrol_uwsgi):
     uwsgi.cache_update.assert_called_once_with(
         "expiring_key", "expiring_value", expected_expire_arg, cache.name
     )
+    # Expire, but too soon
+    expires = datetime.utcnow() + timedelta(seconds=1)
+    with pytest.raises(ValueError) as exc:
+        cache.set("expiring_key", "expiring_value", expires)
+    assert str(exc.value).startswith('Cache entry expires too soon')
+    # Failing cache set
+    if cache.raise_on_errors is True:
+        expected_exc = sys.modules["cachecontrol_uwsgi"].UWSGICacheError
+        uwsgi.cache_update.side_effect = None
+        uwsgi.cache_update.return_value = None
+        with pytest.raises(expected_exc) as exc:
+            cache.set("a", "b")
+        errmsg = "Call to cache_update('a', 'b', 0, %r) failed" % cache.name
+        assert str(exc.value) == errmsg
 
 
 @responses.activate
