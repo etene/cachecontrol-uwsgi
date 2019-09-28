@@ -1,6 +1,6 @@
 # cachecontrol-uwsgi
 
-[![PyPI](https://img.shields.io/pypi/v/cachecontrol-uwsgi.svg)](https://pypi.org/project/cachecontrol-uwsgi/) ![Python versions](https://img.shields.io/pypi/pyversions/cachecontrol-django.svg) [![Build Status](https://travis-ci.org/etene/cachecontrol-uwsgi.svg?branch=master)](https://travis-ci.org/etene/cachecontrol-uwsgi) [![Coverage Status](https://coveralls.io/repos/github/etene/cachecontrol-uwsgi/badge.svg?branch=travis-ci)](https://coveralls.io/github/etene/cachecontrol-uwsgi?branch=travis-ci)
+[![PyPI](https://img.shields.io/pypi/v/cachecontrol-uwsgi.svg)](https://pypi.org/project/cachecontrol-uwsgi/) ![Python versions](https://img.shields.io/pypi/pyversions/cachecontrol-django.svg) [![Build Status](https://travis-ci.org/etene/cachecontrol-uwsgi.svg?branch=master)](https://travis-ci.org/etene/cachecontrol-uwsgi) [![Coverage Status](https://coveralls.io/repos/github/etene/cachecontrol-uwsgi/badge.svg?branch=master)](https://coveralls.io/github/etene/cachecontrol-uwsgi?branch=master)
 
 Backend for [CacheControl](https://github.com/ionrock/cachecontrol) using [uwsgi's caching framework](https://uwsgi-docs.readthedocs.io/en/latest/Caching.html).
 
